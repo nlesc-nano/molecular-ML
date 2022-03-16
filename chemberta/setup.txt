@@ -1,0 +1,8 @@
+  conda create --name chemberta python=3.9
+  conda activate chemberta
+  conda install -c apple tensorflow-deps -y
+  python -m pip install tensorflow-macos
+  pip install tensorflow-metal
+  conda install wandb
+  conda install transformers
+  conda install datasets
