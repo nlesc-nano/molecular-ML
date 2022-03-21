@@ -1,10 +1,10 @@
 program: wandb_wrapper.py
 project: chemberta
-username: apjansen
+entity: apjansen
 method: bayes
 metric:
   goal: minimize
-  name: best_val_loss
+  name: best_val_root_mean_squared_error
 parameters:
   checkpoint:
     value: DeepChem/ChemBERTa-77M-MTR
@@ -13,11 +13,11 @@ parameters:
   task_id:
     value: 0
   epochs:
-    value: 3
+    value: 20
   learning_rate:
-    values: [3e-6, 1e-5, 2e-5, 5e-5, 1e-4]
+    values: [1e-5, 5e-5, 1e-4, 3e-3, 1e-3]
   decay_rate:
-    values: [1., .95, .9]  # each epoch decay lr by this factor
+    values: [1., .95, .9, .7, .5]  # each epoch decay lr by this factor
   batch_size:
     values: [64, 128, 256] # batch size 512 can't be handled by colab
   weight_decay:

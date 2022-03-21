@@ -24,11 +24,11 @@ def train(config=None):
         model, datasets = prepare_training(**config)
 
         callbacks = [
-            # keras.callbacks.EarlyStopping(
-            #     monitor='val_loss',
-            #     patience=config.patience,
-            #     restore_best_weights=True,
-            # ),
+            keras.callbacks.EarlyStopping(
+                monitor='val_loss',
+                patience=config.patience,
+                restore_best_weights=True,
+            ),
             LRLogger(model.optimizer),
             wandb.keras.WandbCallback(
                 monitor='val_root_mean_squared_error',
