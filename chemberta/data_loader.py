@@ -20,9 +20,7 @@ def load_data(
     compatible with tensorflow based transformers models.
 
     """
-    print("loading carboxylics")
     carboxylics_frame = pd.read_csv(filename, index_col='Unnamed: 0')
-    print("done loading")
     tasks = list(carboxylics_frame.columns[2:])
 
     df = carboxylics_frame[['smiles', tasks[task_id]]]
