@@ -9,7 +9,7 @@ def load_model_and_tokenizer(
         num_labels: int = 1,
         from_pt: bool = True):
     set_seed(seed)
-
+    
     model = TFAutoModelForSequenceClassification.from_pretrained(
         checkpoint,
         num_labels=num_labels,

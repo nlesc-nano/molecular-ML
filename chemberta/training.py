@@ -50,8 +50,7 @@ def prepare_training(
         batch_size=batch_size,
     )
 
-    num_batches = len(datasets['train'])  # use to decay per epoch
-    optimizer = create_optimizer(learning_rate, decay_rate, weight_decay, num_batches)
+    optimizer = create_optimizer(learning_rate, decay_rate, weight_decay)
 
     model.compile(
         optimizer=optimizer,
@@ -61,10 +60,10 @@ def prepare_training(
     
     return model, datasets
 
-def create_optimizer(learning_rate, decay_rate, weight_decay, num_batches):
+def create_optimizer(learning_rate, decay_rate, weight_decay):
     schedule = keras.optimizers.schedules.ExponentialDecay(
         learning_rate,
-        decay_steps=num_batches,
+        decay_steps=1,  # every epoch
         decay_rate=decay_rate,
     )
     return  AdamWeightDecay(
@@ -75,8 +74,8 @@ def create_optimizer(learning_rate, decay_rate, weight_decay, num_batches):
 
 def main():
     fine_tune(
-        checkpoint='../data/all_carboxylics.csv',
-        filename='DeepChem/ChemBERTa-77M-MTR',
+        filename='../data/all_carboxylics.csv',
+        checkpoint='DeepChem/ChemBERTa-77M-MTR',
         task_id=0,
         batch_size=32,
         epochs=1,
