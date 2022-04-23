@@ -5,6 +5,7 @@ from transformers import DefaultDataCollator
 from utils import set_seed
 
 
+
 def load_data(
     filename: str,
     tokenizer,
@@ -22,13 +23,14 @@ def load_data(
     """
     carboxylics_frame = pd.read_csv(filename, index_col='Unnamed: 0')
     tasks = list(carboxylics_frame.columns[2:])
+    carboxylics_frame=carboxylics_frame.dropna(axis=0) #Delete rows containing any Nan(s)
 
     df = carboxylics_frame[['smiles', tasks[task_id]]]
     df = df.rename(columns={tasks[task_id]: 'label', 'smiles': 'text'})
 
     def tokenize(batch):
         return tokenizer(batch['text'], padding=True, truncation=True)
-
+        
     dataset = Dataset.from_pandas(df, preserve_index=False)
     dataset = dataset.map(tokenize, batched=True, batch_size=None)
 
