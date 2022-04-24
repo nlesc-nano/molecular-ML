@@ -24,6 +24,7 @@ def load_data(
     carboxylics_frame = pd.read_csv(filename, index_col='Unnamed: 0')
     tasks = list(carboxylics_frame.columns[2:])
     carboxylics_frame=carboxylics_frame.dropna(axis=0) #Delete rows containing any Nan(s)
+    carboxylics_frame[tasks[task_id]]=carboxylics_frame[tasks[task_id]]/180. #normalizing the cone angles
 
     df = carboxylics_frame[['smiles', tasks[task_id]]]
     df = df.rename(columns={tasks[task_id]: 'label', 'smiles': 'text'})
