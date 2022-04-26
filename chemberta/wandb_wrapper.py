@@ -60,4 +60,5 @@ if __name__ == '__main__':
         'weight_decay': 0.,
         'patience': 5
     }
+    keras.backend.clear_session()
     main(config=defaults)
