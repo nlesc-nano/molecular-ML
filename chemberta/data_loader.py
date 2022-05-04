@@ -11,9 +11,8 @@ def load_data(
     task_id,
     batch_size: int = 64,
     seed: int = 42,
-    train_frac: float = 0.8,
+    train_frac: float = 0.9,
     val_frac: float = 0.1,
-    test_frac: float = 0.1,
     single_batch: bool = False,
     ):
     """
@@ -39,7 +38,7 @@ def load_data(
     dataset = dataset.map(tokenize, batched=True, batch_size=None)
 
     dataset.set_format('torch', columns=['input_ids', 'attention_mask', 'label'])
-    datasets = split_dataset(dataset, train_frac, val_frac, test_frac, seed)
+    datasets = split_dataset(dataset, train_frac, val_frac, seed)
 
     if single_batch:
         datasets = DatasetDict({key: _first_batch(val, batch_size)
@@ -61,13 +60,12 @@ def _first_batch(dataset, batch_size):
     """Take single batch from arrow_dataset."""
     return Dataset.from_dict(dataset[:batch_size])
 
-def split_dataset(dataset, train_frac, val_frac, test_frac, seed):
+def split_dataset(dataset, train_frac, val_frac, seed):
     """Split dataset into train, validation and test splits with specified ratios."""
     train_testvalid = dataset.train_test_split(test_size=(1 - train_frac), seed=seed)
-    test_valid = train_testvalid['test'].train_test_split(test_size=test_frac / (test_frac + val_frac), seed=seed)
+
     return DatasetDict({
         'train': train_testvalid['train'],
-        'test': test_valid['test'],
-        'val': test_valid['train']
+        'val': train_testvalid['test']
     })
 
