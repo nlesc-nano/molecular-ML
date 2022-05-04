@@ -24,6 +24,7 @@ def load_data(
     carboxylics_frame = pd.read_csv(filename, index_col='Unnamed: 0')
     all_tasks = list(carboxylics_frame.columns[2:])
     task = all_tasks[task_id]
+    carboxylics_frame = carboxylics_frame[['smiles', task]]
 
     carboxylics_frame=carboxylics_frame.dropna(axis=0) #Delete rows containing any Nan(s)
     carboxylics_frame[task]=carboxylics_frame[task] / 180. #normalizing the cone angles
