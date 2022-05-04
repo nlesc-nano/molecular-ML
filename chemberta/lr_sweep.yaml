@@ -1,7 +1,7 @@
 program: wandb_wrapper.py
 project: chemberta
 entity: apjansen
-method: bayes
+method: grid
 metric:
   goal: minimize
   name: best_val_root_mean_squared_error
@@ -13,17 +13,19 @@ parameters:
   task_id:
     value: 0
   epochs:
-    value: 20
+    value: 8
   learning_rate:
-    values: [1e-5, 5e-5, 1e-4, 3e-3, 1e-3]
+    values: [3e-5, 1e-4, 3e-4, 1e-3, 3e-3]
   decay_rate:
-    values: [1., .95, .9, .7, .5]  # each epoch decay lr by this factor
+    value: 1.  # each epoch decay lr by this factor
   batch_size:
-    values: [64, 128, 256] # batch size 512 can't be handled by colab
+    value: 512
   weight_decay:
     value: 0.
   patience:
     value: 5
+  single_batch:
+    value: False
 # early_terminate:  # TODO: check what exactly this does and if these values make sense
 #   type: hyperband
 #   s: 2

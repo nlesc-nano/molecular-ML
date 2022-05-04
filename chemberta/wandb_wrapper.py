@@ -38,7 +38,7 @@ def train(config=None):
         ]
 
         model.fit(
-            datasets['train'], 
+            datasets['train'],
             validation_data=datasets['val'],
             epochs=config.epochs,
             callbacks=callbacks,
@@ -51,14 +51,15 @@ def main(config):
 if __name__ == '__main__':
     defaults = {
         'checkpoint': 'DeepChem/ChemBERTa-77M-MTR',
-        'filename':  '../data/all_carboxylics.csv',
+        'filename':  '../data/cone_angle_carbox_11k.csv',
         'task_id': 0,
         'epochs': 3,
         'learning_rate': 1e-4,
         'decay_rate': 1.,
-        'batch_size': 256,
+        'batch_size': 512,
         'weight_decay': 0.,
-        'patience': 5
+        'patience': 5,
+        'single_batch': False,
     }
     keras.backend.clear_session()
     main(config=defaults)
