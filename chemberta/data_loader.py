@@ -13,7 +13,9 @@ def load_data(
     seed: int = 42,
     train_frac: float = 0.8,
     val_frac: float = 0.1,
-    test_frac: float = 0.1):
+    test_frac: float = 0.1,
+    single_batch: bool = False,
+    ):
     """
     Load data from filename, extracting a single task, splitting into
     training, validation and test data, and putting it in a format that is
@@ -38,6 +40,10 @@ def load_data(
     dataset.set_format('torch', columns=['input_ids', 'attention_mask', 'label'])
     datasets = split_dataset(dataset, train_frac, val_frac, test_frac, seed)
 
+    if single_batch:
+        datasets = DatasetDict({key: _first_batch(val, batch_size)
+            for key, val in datasets.items()})
+
     data_collator = DefaultDataCollator(return_tensors='tf')
     set_seed(seed)
     tf_dataset = {k: v.to_tf_dataset(
@@ -49,6 +55,10 @@ def load_data(
                     for k, v in datasets.items()
     }
     return tf_dataset
+
+def _first_batch(dataset, batch_size):
+    """Take single batch from arrow_dataset."""
+    return Dataset.from_dict(dataset[:batch_size])
 
 def split_dataset(dataset, train_frac, val_frac, test_frac, seed):
     """Split dataset into train, validation and test splits with specified ratios."""
