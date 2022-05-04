@@ -5,7 +5,6 @@ from transformers import DefaultDataCollator
 from utils import set_seed
 
 
-
 def load_data(
     filename: str,
     tokenizer,
@@ -16,23 +15,23 @@ def load_data(
     val_frac: float = 0.1,
     test_frac: float = 0.1):
     """
-    Load data from filename, extracting a single task, splitting into 
+    Load data from filename, extracting a single task, splitting into
     training, validation and test data, and putting it in a format that is
     compatible with tensorflow based transformers models.
-
     """
     carboxylics_frame = pd.read_csv(filename, index_col='Unnamed: 0')
-    tasks = list(carboxylics_frame.columns[2:])
-    carboxylics_frame=carboxylics_frame.dropna(axis=0) #Delete rows containing any Nan(s)
-    carboxylics_frame=carboxylics_frame[carboxylics_frame[tasks[task_id]]<=180]
-    carboxylics_frame[tasks[task_id]]=carboxylics_frame[tasks[task_id]]/180. #normalizing the cone angles
+    all_tasks = list(carboxylics_frame.columns[2:])
+    task = all_tasks[task_id]
 
-    df = carboxylics_frame[['smiles', tasks[task_id]]]
-    df = df.rename(columns={tasks[task_id]: 'label', 'smiles': 'text'})
+    carboxylics_frame=carboxylics_frame.dropna(axis=0) #Delete rows containing any Nan(s)
+    carboxylics_frame[task]=carboxylics_frame[task] / 180. #normalizing the cone angles
+
+    df = carboxylics_frame[['smiles', task]]
+    df = df.rename(columns={task: 'label', 'smiles': 'text'})
 
     def tokenize(batch):
         return tokenizer(batch['text'], padding=True, truncation=True)
-        
+
     dataset = Dataset.from_pandas(df, preserve_index=False)
     dataset = dataset.map(tokenize, batched=True, batch_size=None)
 
@@ -60,3 +59,4 @@ def split_dataset(dataset, train_frac, val_frac, test_frac, seed):
         'test': test_valid['test'],
         'val': test_valid['train']
     })
+
