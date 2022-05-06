@@ -9,7 +9,7 @@ parameters:
   checkpoint:
     value: DeepChem/ChemBERTa-77M-MTR
   filename:
-    value: ../data/all_carboxylics.csv
+    value: ../data/cone_angle_carbox_11k.csv
   task_id:
     value: 0
   epochs:

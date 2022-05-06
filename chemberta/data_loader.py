@@ -11,20 +11,25 @@ def load_data(
     task_id,
     batch_size: int = 64,
     seed: int = 42,
-    train_frac: float = 0.8,
+    train_frac: float = 0.9,
     val_frac: float = 0.1,
-    test_frac: float = 0.1):
+    single_batch: bool = False,
+    ):
     """
-    Load data from filename, extracting a single task, splitting into 
+    Load data from filename, extracting a single task, splitting into
     training, validation and test data, and putting it in a format that is
     compatible with tensorflow based transformers models.
-
     """
     carboxylics_frame = pd.read_csv(filename, index_col='Unnamed: 0')
-    tasks = list(carboxylics_frame.columns[2:])
+    all_tasks = list(carboxylics_frame.columns[2:])
+    task = all_tasks[task_id]
+    carboxylics_frame = carboxylics_frame[['smiles', task]]
 
-    df = carboxylics_frame[['smiles', tasks[task_id]]]
-    df = df.rename(columns={tasks[task_id]: 'label', 'smiles': 'text'})
+    carboxylics_frame=carboxylics_frame.dropna(axis=0) #Delete rows containing any Nan(s)
+    carboxylics_frame[task]=carboxylics_frame[task] / 180. #normalizing the cone angles
+
+    df = carboxylics_frame[['smiles', task]]
+    df = df.rename(columns={task: 'label', 'smiles': 'text'})
 
     def tokenize(batch):
         return tokenizer(batch['text'], padding=True, truncation=True)
@@ -33,7 +38,11 @@ def load_data(
     dataset = dataset.map(tokenize, batched=True, batch_size=None)
 
     dataset.set_format('torch', columns=['input_ids', 'attention_mask', 'label'])
-    datasets = split_dataset(dataset, train_frac, val_frac, test_frac, seed)
+    datasets = split_dataset(dataset, train_frac, val_frac, seed)
+
+    if single_batch:
+        datasets = DatasetDict({key: _first_batch(val, batch_size)
+            for key, val in datasets.items()})
 
     data_collator = DefaultDataCollator(return_tensors='tf')
     set_seed(seed)
@@ -47,12 +56,16 @@ def load_data(
     }
     return tf_dataset
 
-def split_dataset(dataset, train_frac, val_frac, test_frac, seed):
+def _first_batch(dataset, batch_size):
+    """Take single batch from arrow_dataset."""
+    return Dataset.from_dict(dataset[:batch_size])
+
+def split_dataset(dataset, train_frac, val_frac, seed):
     """Split dataset into train, validation and test splits with specified ratios."""
     train_testvalid = dataset.train_test_split(test_size=(1 - train_frac), seed=seed)
-    test_valid = train_testvalid['test'].train_test_split(test_size=test_frac / (test_frac + val_frac), seed=seed)
+
     return DatasetDict({
         'train': train_testvalid['train'],
-        'test': test_valid['test'],
-        'val': test_valid['train']
+        'val': train_testvalid['test']
     })
+
