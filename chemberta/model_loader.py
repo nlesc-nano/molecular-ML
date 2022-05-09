@@ -7,15 +7,23 @@ def load_model_and_tokenizer(
         checkpoint,
         seed: int = 42,
         num_labels: int = 1,
-        from_pt: bool = True):
+        from_pt: bool = True,
+        classification: bool = False,
+        freeze_base: bool = False,
+        ):
     set_seed(seed)
-    
+    problem_type = 'classification' if classification else 'regression'
     model = TFAutoModelForSequenceClassification.from_pretrained(
         checkpoint,
         num_labels=num_labels,
-        problem_type='regression',
+        problem_type=problem_type,
         from_pt=from_pt  # original model is in pytorch
     )
+
+    if freeze_base:
+        # freeze all base layers, leaving only the top 2 trainable
+        # NOTE: this will have to change for a model that is not roberta-based
+        model.roberta.trainable = False
 
     tokenizer = AutoTokenizer.from_pretrained(checkpoint)
 

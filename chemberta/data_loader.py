@@ -14,6 +14,9 @@ def load_data(
     train_frac: float = 0.9,
     val_frac: float = 0.1,
     single_batch: bool = False,
+    classification: bool = False,
+    lower_bound: float = 30.,
+    upper_bound: float = 90.,
     ):
     """
     Load data from filename, extracting a single task, splitting into
@@ -24,12 +27,17 @@ def load_data(
     all_tasks = list(carboxylics_frame.columns[2:])
     task = all_tasks[task_id]
     carboxylics_frame = carboxylics_frame[['smiles', task]]
+    carboxylics_frame = carboxylics_frame.dropna(axis=0)
 
-    carboxylics_frame=carboxylics_frame.dropna(axis=0) #Delete rows containing any Nan(s)
-    carboxylics_frame[task]=carboxylics_frame[task] / 180. #normalizing the cone angles
+    t = carboxylics_frame[task]
+    if classification:
+        t = (lower_bound < t) & (t < upper_bound)
+        carboxylics_frame[task] = t.astype('int') 
+    else:
+        #normalizing the cone angles
+        carboxylics_frame[task] = t / 180.
 
-    df = carboxylics_frame[['smiles', task]]
-    df = df.rename(columns={task: 'label', 'smiles': 'text'})
+    df = carboxylics_frame.rename(columns={task: 'label', 'smiles': 'text'})
 
     def tokenize(batch):
         return tokenizer(batch['text'], padding=True, truncation=True)

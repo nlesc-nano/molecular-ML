@@ -53,12 +53,12 @@ if __name__ == '__main__':
         'checkpoint': 'DeepChem/ChemBERTa-77M-MTR',
         'filename':  '../data/cone_angle_carbox_11k.csv',
         'task_id': 0,
-        'epochs': 3,
-        'learning_rate': 1e-4,
-        'decay_rate': 1.,
+        'epochs': 100,
+        'learning_rate': 3e-4,
+        'decay_rate': .85,
         'batch_size': 512,
         'weight_decay': 0.,
-        'patience': 5,
+        'patience': 500,
         'single_batch': False,
     }
     keras.backend.clear_session()
