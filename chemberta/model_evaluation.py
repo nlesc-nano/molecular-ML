@@ -46,6 +46,11 @@ def plot_model_evaluation(model,test_dataset):
     plt.plot(test_labels[:100],'b.',fillstyle='none',label="truth")
     plt.legend(); plt.ylabel("cone_angle/180")
     plt.savefig("bestModel_eval.pdf")
+    plt.figure(200)
+    plt.plot(test_predictions.logits[:100],test_labels[:100],'k.')
+    plt.ylabel("Predictied cone_angle/180"); plt.xlabel("Truth cone_angle/180")
+    plt.savefig("bestModel_eval_2.pdf")
+
 
 if __name__ == '__main__':
     #model loading
