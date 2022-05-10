@@ -22,7 +22,7 @@ def load_data(path_to_data):
 	normalization_transformers = dc.trans.NormalizationTransformer(transform_y=True, dataset=dataset_cone_angle)
 	dataset_cone_angle=normalization_transformers.transform(dataset_cone_angle)
 
-	#Splitting the data
+	#Splitting the data, defaults frac_train=0.8, frac_val=0.1, frac_test=0.1
 	splitter = dc.splits.ScaffoldSplitter()
 	data_train, data_val, data_test = splitter.train_valid_test_split(dataset_cone_angle,seed=82)
 
