@@ -1,4 +1,5 @@
 from transformers import AdamWeightDecay
+from tensorflow.keras.optimizers import Adam
 import tensorflow as tf
 from tensorflow import keras
 
@@ -23,7 +24,7 @@ def fine_tune(
 
     model, datasets = prepare_training(
         checkpoint, filename, task_id, batch_size, learning_rate, weight_decay,
-        decay_rate, single_batch, classification, freeze_base
+        decay_rate, single_batch, classification, freeze_base,
     )
 
     model.fit(
@@ -50,7 +51,6 @@ def prepare_training(
     model, tokenizer = load_model_and_tokenizer(
             checkpoint,
             classification=classification,
-            freeze_base=freeze_base,
             )
 
     datasets = load_data(
@@ -69,6 +69,11 @@ def prepare_training(
     else:
         metric = tf.keras.metrics.RootMeanSquaredError()
 
+    if freeze_base:
+        # freeze all base layers, leaving only the top 2 trainable
+        # NOTE: this will have to change for a model that is not roberta-based
+        model.roberta.trainable = False
+
     model.compile(
         optimizer=optimizer,
         loss=tf.keras.losses.MeanSquaredError(),
@@ -83,10 +88,7 @@ def create_optimizer(learning_rate, decay_rate, weight_decay):
         decay_steps=1,  # every epoch
         decay_rate=decay_rate,
     )
-    return  AdamWeightDecay(
-        learning_rate=schedule,
-        weight_decay_rate=weight_decay,
-    )
+    return Adam(learning_rate=schedule)
 
 
 def main():
@@ -95,12 +97,12 @@ def main():
         checkpoint='DeepChem/ChemBERTa-77M-MTR',
         task_id=0,
         batch_size=512,
-        epochs=100,
+        epochs=2,
         learning_rate=3e-4,
         decay_rate=1.,
         weight_decay=0.,
         callbacks=[],
-        single_batch=True,
+        single_batch=False,
         classification=False,
         freeze_base=True,
     )

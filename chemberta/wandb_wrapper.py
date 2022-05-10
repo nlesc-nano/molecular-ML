@@ -24,12 +24,12 @@ def train(config=None):
         model, datasets = prepare_training(**config)
 
         callbacks = [
-            keras.callbacks.EarlyStopping(
-                monitor='val_loss',
-                patience=config.patience,
-                restore_best_weights=True,
-            ),
-            LRLogger(model.optimizer),
+                # keras.callbacks.EarlyStopping(
+                #     monitor='val_loss',
+                #     patience=config.patience,
+                #     restore_best_weights=True,
+                # ),
+                # LRLogger(model.optimizer),
             wandb.keras.WandbCallback(
                 monitor='val_root_mean_squared_error',
                 save_model=True,
@@ -60,6 +60,8 @@ if __name__ == '__main__':
         'weight_decay': 0.,
         'patience': 500,
         'single_batch': False,
+        'freeze_base': True,
+        'classification': False,
     }
-    keras.backend.clear_session()
+    # keras.backend.clear_session()
     main(config=defaults)

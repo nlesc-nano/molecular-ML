@@ -47,10 +47,13 @@ def plot_model_evaluation(model,test_dataset):
     plt.legend(); plt.ylabel("cone_angle/180")
     plt.savefig("bestModel_eval.pdf")
 
+    plt.plot(test_predictions.logits[:100])
+
 if __name__ == '__main__':
     #model loading
     model_orig, tokenizer = load_model_and_tokenizer('DeepChem/ChemBERTa-77M-MTR')
     entity_project_sweep_id="luisaforozco/chemberta/z1e2ggux/"
+    entity_project_sweep_id="apjansen/chemberta/5ble16ck/"
     best_run_id=get_best_sweep(entity_project_sweep_id)
     best_model=restore_model_wandb(entity_project_sweep_id+best_run_id,model_orig)
 
@@ -59,7 +62,7 @@ if __name__ == '__main__':
         filename='../data/cone_angle_carbox_11K.csv',
         tokenizer=tokenizer,
         task_id=0,
-        batch_size=32,
+        batch_size=512,
     )
 
     best_model.compile(
@@ -68,6 +71,6 @@ if __name__ == '__main__':
         metrics=[tf.keras.metrics.RootMeanSquaredError()],
     )
     
-    results = best_model.evaluate(datasets['test'], batch_size=32)
+    results = best_model.evaluate(datasets['val'], batch_size=32)
     print("test loss, test root mse:", results)
-    plot_model_evaluation(best_model,datasets['test'])
+    plot_model_evaluation(best_model,datasets['val'])
