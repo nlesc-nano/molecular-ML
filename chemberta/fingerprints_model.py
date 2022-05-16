@@ -19,8 +19,8 @@ def load_data(path_to_data):
 	dataset_cone_angle = data_loader.create_dataset(path_to_data)
 	
 	#Normalizing the data to have zero mean and unit standard deviation.
-	normalization_transformers = dc.trans.NormalizationTransformer(transform_y=True, dataset=dataset_cone_angle)
-	dataset_cone_angle=normalization_transformers.transform(dataset_cone_angle)
+	#normalization_transformers = dc.trans.NormalizationTransformer(transform_y=True, dataset=dataset_cone_angle)
+	#dataset_cone_angle=normalization_transformers.transform(dataset_cone_angle)
 
 	#Splitting the data, defaults frac_train=0.8, frac_val=0.1, frac_test=0.1
 	splitter = dc.splits.ScaffoldSplitter()
@@ -38,11 +38,15 @@ def model_fingerprints(dataset):
 	Returns the trained model
 	"""
 	n_neurons=1000
+	"""model_keras = keras.Sequential([
+		keras.layers.Dense(n_neurons,activation='relu'),
+		keras.layers.Dense(n_neurons*2,activation='relu'),
+		keras.layers.Dense(n_neurons*2,activation='relu'),
+		keras.layers.Dense(n_neurons,activation='relu'),
+		keras.layers.Dense(1,name="output_cone_angle")
+		])"""
 	model_keras = keras.Sequential([
-		keras.layers.Dense(n_neurons,activation='relu'),
-		keras.layers.Dense(n_neurons*2,activation='relu'),
-		keras.layers.Dense(n_neurons*2,activation='relu'),
-		keras.layers.Dense(n_neurons,activation='relu'),
+		keras.layers.Dense(10,activation='relu'),
 		keras.layers.Dense(1,name="output_cone_angle")
 		])
 	#model=dc.models.KerasModel(model_keras, dc.models.losses.L2Loss(), optimizer=dc.models.optimizers.Adam())
@@ -80,7 +84,7 @@ def evaluate_model(model,dataset):
 
 if __name__ == '__main__':
 	print("++++Data preparation")
-	dataset_cone_angle = load_data('../data/cone_angle_carbox_11K.csv')
+	dataset_cone_angle = load_data('../data/cone_angle_carbox_11K_norm180.csv')
 	print("++++Model definition and training")
 	model = model_fingerprints(dataset_cone_angle)
 	print("++++Model evaluation")
