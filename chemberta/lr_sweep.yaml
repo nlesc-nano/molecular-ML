@@ -13,11 +13,11 @@ parameters:
   task_id:
     value: 0
   epochs:
-    value: 8
+    value: 25
   learning_rate:
     values: [3e-5, 1e-4, 3e-4, 1e-3, 3e-3]
   decay_rate:
-    value: 1.  # each epoch decay lr by this factor
+    values: [1., 0.99, 0.95, 0.9]  # each epoch decay lr by this factor
   batch_size:
     value: 512
   weight_decay:
@@ -26,8 +26,7 @@ parameters:
     value: 5
   single_batch:
     value: False
-# early_terminate:  # TODO: check what exactly this does and if these values make sense
-#   type: hyperband
-#   s: 2
-#   eta: 3
-#   max_iter: 50
+  freeze_base:
+    value: True
+  classification:
+    value: False
