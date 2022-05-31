@@ -13,7 +13,7 @@ from model_loader import load_model_and_tokenizer
 from model_evaluation import get_best_sweep, restore_model_wandb
 
 MODEL_CHECKPOINT = 'DeepChem/ChemBERTa-77M-MTR'
-SWEEP_ID  = 'apjansen/chemberta/5pw5mcyz/'
+SWEEP_ID  = 'apjansen/chemberta/1pzw7wz8/'
 DATA_FILE = '../data/carbox_fulldatabase.csv'
 TOKENIZED_DATA = '../data/carbox_full_tokenized'
 PREDICTIONS_PATH = '../data/carbox_predictions.hdf5'
