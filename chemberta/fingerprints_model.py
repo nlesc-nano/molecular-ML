@@ -38,26 +38,31 @@ def model_fingerprints(dataset):
 	Returns the trained model
 	"""
 	n_neurons=1000
-	"""model_keras = keras.Sequential([
+	"""
+	model_keras = keras.Sequential([
 		keras.layers.Dense(n_neurons,activation='relu'),
 		keras.layers.Dense(n_neurons*2,activation='relu'),
 		keras.layers.Dense(n_neurons*2,activation='relu'),
 		keras.layers.Dense(n_neurons,activation='relu'),
 		keras.layers.Dense(1,name="output_cone_angle")
-		])"""
+		])
+	"""
 	model_keras = keras.Sequential([
 		keras.layers.Dense(10,activation='relu'),
 		keras.layers.Dense(1,name="output_cone_angle")
 		])
+	
 	#model=dc.models.KerasModel(model_keras, dc.models.losses.L2Loss(), optimizer=dc.models.optimizers.Adam())
 	model=dc.models.KerasModel(model_keras,dc.models.losses.L2Loss(),batch_size=300)
 	#vc = dc.models.ValidationCallback(…)
-	
+
 	#training, fit returns: The average loss over the most recent checkpoint interval
 	loss_history=[] #list of the loss during training, size= number of steps
 	last_loss=model.fit(dataset['train'],nb_epoch=20,all_losses=loss_history)
 	print(f'Last loss during trainning: {last_loss}, and the whole history:')
 	print(loss_history)
+	#model_keras.build(input_shape=dataset['train'].shape())
+	#print(model_keras.summary())
 	return model
 
 def evaluate_model(model,dataset):
@@ -81,6 +86,29 @@ def evaluate_model(model,dataset):
 	plt.ylabel("Predictied cone_angle (normalized)") 
 	plt.xlabel("Truth cone_angle (normalized)")
 	plt.savefig("EvalFingerprintsModel.pdf")
+
+	plt.figure(201)
+	plt.plot(test_labels,np.abs(test_predictions-test_labels)/test_labels,'b.')
+	plt.ylabel("|Predicted-Truth|/Truth") 
+	plt.xlabel("Truth cone_angle (normalized)")
+	plt.savefig("EvalFingerprintsModel2.pdf")
+	plt.figure(202)
+	plt.plot(test_labels,np.abs(test_predictions-test_labels),'r.')
+	plt.ylabel("|Predicted-Truth|") 
+	plt.xlabel("Truth cone_angle (normalized)")
+	plt.savefig("EvalFingerprintsModel3.pdf")
+	plt.figure(203)
+	plt.plot(test_labels,test_predictions-test_labels,'r.')
+	plt.ylabel("Predicted-Truth") 
+	plt.xlabel("Truth cone_angle (normalized)")
+	plt.savefig("EvalFingerprintsModel4.pdf")
+
+	plt.figure(204)
+	plt.hist(test_predictions,bins=100)
+	plt.xlabel("Predicted cone_angle (normalized)")
+	plt.ylabel("counts") 
+	plt.savefig("EvalFingerprints_HistPredicitons.pdf")
+
 
 if __name__ == '__main__':
 	print("++++Data preparation")
