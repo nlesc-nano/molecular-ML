@@ -68,6 +68,39 @@ def plot_predictions(datasets, best_model, path):
     ax2.hist(predicted_angles, bins=100)
     fig.savefig(path)
 
+def plot_filtered_stats(datasets, best_model, path):
+    """
+    Use the predicted angles to select the fraction x of the validation data with
+    the lowest predicted angle.
+    Then measure statistics of the true angles for that selection,
+    and plot as a function of the fraction.
+    """
+    true_angles = tf.concat([y for X, y in datasets['val']], axis=0)
+    predictions = best_model.predict(datasets['val'])
+    predicted_angles = tf.reshape(tf.convert_to_tensor(predictions['logits']), true_angles.shape)
+
+    sorted_indices = tf.argsort(predicted_angles)
+    sorted_predictions = tf.gather(predicted_angles, sorted_indices)
+    sorted_truths = tf.gather(true_angles, sorted_indices)
+
+    percentages = tf.range(len(predicted_angles)) / len(predicted_angles)
+    percentages = percentages[:(len(percentages) // 5)]
+    means, maxes = [], []
+    # for some reason doing this in a list comprehension didn't work
+    for i in range(1, len(percentages) + 1):
+        means.append(tf.reduce_mean(true_angles[:i]))
+        maxes.append(tf.reduce_max(true_angles[:i]))
+    means = tf.concat(means, axis=0)
+    maxes = tf.concat(maxes, axis=0)
+
+    fig, ax = plt.subplots()
+    ax.set_xlabel('Fraction Kept')
+    ax.plot(percentages, means)
+    ax.plot(percentages, maxes)
+    ax.legend(['mean', 'max'])
+
+    fig.savefig(path)
+
 if __name__ == '__main__':
     #model loading
     model_orig, tokenizer = load_model_and_tokenizer('DeepChem/ChemBERTa-77M-MTR')
@@ -94,6 +127,7 @@ if __name__ == '__main__':
     results = best_model.evaluate(datasets['val'], batch_size=32)
 
     plot_predictions(datasets, best_model, path='prediction_errors.jpg')
+    plot_filtered_stats(datasets, best_model, path='filtered_stats.jpg')
 
     print("test loss, test root mse:", results)
     plot_model_evaluation(best_model,datasets['val'])
