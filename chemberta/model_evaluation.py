@@ -88,8 +88,8 @@ def plot_filtered_stats(datasets, best_model, path):
     means, maxes = [], []
     # for some reason doing this in a list comprehension didn't work
     for i in range(1, len(percentages) + 1):
-        means.append(tf.reduce_mean(true_angles[:i]))
-        maxes.append(tf.reduce_max(true_angles[:i]))
+        means.append(tf.reduce_mean(sorted_truths[:i]))
+        maxes.append(tf.reduce_max(sorted_truths[:i]))
     means = tf.concat(means, axis=0)
     maxes = tf.concat(maxes, axis=0)
 
